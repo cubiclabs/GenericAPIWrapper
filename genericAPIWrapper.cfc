@@ -22,6 +22,7 @@ component {
 		"headers": {}, // default headers defined similar to axios
 		"postData": {}, // default postData to send in requests other than GET
 		"cookies": {}, // cookies to send with every request
+		"query": {}, // query parameters to send with every request
 		"httpMethods": listToArray("get,post,delete,put,patch,head,options,trace,connect")
 	};
 
@@ -63,11 +64,15 @@ component {
 		string httpMethod="GET", 
 		any body="", 
 		struct postData={},
+		struct query={},
 		struct headers={},
 		struct cookies={},
 		numeric timeout=getSetting("timeout"),
 		string bearer=getSetting("apiBearer"),
-		string contentType=getSetting("contentType")){
+		string contentType=getSetting("contentType"),
+		string username=getSetting("apiUserName"),
+		string password=getSetting("apiPassword"),
+		string charset=getSetting("charset")){
 
 		if(!len(getSetting("apiEndPoint"))){
 			throw("No api endpoint is defined");
@@ -76,13 +81,35 @@ component {
 		local.t = getTickCount();
 
 		// ===================
+		// form our endpoint URL
+		local.targetURL = getSetting("apiEndPoint") & arguments.apiPath;
+		local.requestQueryParam = {};
+		structAppend(local.requestQueryParam, getSetting("query"));
+		structAppend(local.requestQueryParam, arguments.query);
+		local.requestQuery = [];
+		for(local.queryKey in structKeyArray(local.requestQueryParam)){
+			arrayAppend(local.requestQuery, local.queryKey & "=" &encodeForURL(local.requestQueryParam[local.queryKey]));
+		}
+		if(arraylen(local.requestQuery)){
+			if(local.targetURL CONTAINS "?"){
+				if(right(local.targetURL, 1) != "?"){
+					local.targetURL &= "&";
+				}
+			}else{
+				local.targetURL &= "?"
+			}
+			local.targetURL &= arrayToList(local.requestQuery, "&");
+		}
+		
+
+		// ===================
 		// define a HTTP request
 		local.httpService = new http(
 			method=arguments.httpMethod, 
-			charset=getSetting("charset"), 
-			url=getSetting("apiEndPoint") & arguments.apiPath,
-			username=getSetting("apiUserName"),
-			password=getSetting("apiPassword"),
+			charset=arguments.charset, 
+			url=local.targetURL,
+			username=arguments.username,
+			password=arguments.password,
 			timeout=arguments.timeout);
 
 		// ===================
@@ -96,11 +123,13 @@ component {
 
 		// ===================
 		// form data
-		local.requestPostData = {};
-		structAppend(local.requestPostData, getSetting("postData"));
-		structAppend(local.requestPostData, arguments.postData);
-		for(local.fieldKey in structKeyArray(local.requestPostData)){
-			local.httpService.addParam(type:"formField", name:local.fieldKey, value:local.requestPostData[local.fieldKey]);
+		if(arguments.httpMethod != "GET"){
+			local.requestPostData = {};
+			structAppend(local.requestPostData, getSetting("postData"));
+			structAppend(local.requestPostData, arguments.postData);
+			for(local.fieldKey in structKeyArray(local.requestPostData)){
+				local.httpService.addParam(type:"formField", name:local.fieldKey, value:local.requestPostData[local.fieldKey]);
+			}
 		}
 
 		// ===================
@@ -210,7 +239,7 @@ component {
 				if(structKeyExists(local.apiArgs, "apiPath")){
 					local.apiArgs.apiPath = local.apiMethod & "/" & local.apiArgs.apiPath;
 				}else{
-					local.apiArgs.apiPath = local.apiMethod;
+					local.apiArgs.apiPath = local.apiMethod & "/";
 				}
 
 				// do our api request

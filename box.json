@@ -1,0 +1,32 @@
+{
+    "name":"GenericAPIWrapper",
+    "version":"1.0.0",
+    "location":"cubiclabs/GenericAPIWrapper",
+    "author":"CUBICstate <studio@cubicstate.com>",
+    "contributors":[
+        "Martin Webb <martin@cubicstate.com>"
+    ],
+    "bugs":"https://github.com/cubiclabs/GenericAPIWrapper/issues",
+    "documentation":"https://github.com/cubiclabs/GenericAPIWrapper",
+    "homepage": "https://github.com/cubiclabs/GenericAPIWrapper",
+    "repository":{
+        "type":"git",
+        "URL":"https://github.com/cubiclabs/GenericAPIWrapper"
+    },
+    "ignore":[
+        "**/.*",
+        "/test/",
+        "/tests/",
+        "/docs/"
+    ],
+    "keywords":["api"],
+    "license":[
+        {
+            "type":"Apache2",
+            "url":"http://www.apache.org/licenses/LICENSE-2.0.html"
+        }
+    ],
+    "shortDescription":"A generic wrapper for API's that lets you quickly create an interface to most API's.",
+    "slug":"GenericAPIWrapper",
+    "type":"modules"
+}
