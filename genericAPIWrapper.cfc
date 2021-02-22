@@ -19,6 +19,7 @@ component {
 		"lowerCase": false,
 		"contentType": "",
 		"charset": "utf-8",
+		"fileExtension": "",
 		"headers": {}, // default headers defined similar to axios
 		"postData": {}, // default postData to send in requests other than GET
 		"cookies": {}, // cookies to send with every request
@@ -72,7 +73,8 @@ component {
 		string contentType=getSetting("contentType"),
 		string username=getSetting("apiUserName"),
 		string password=getSetting("apiPassword"),
-		string charset=getSetting("charset")){
+		string charset=getSetting("charset"),
+		string fileExtension=getSetting("fileExtension")){
 
 		if(!len(getSetting("apiEndPoint"))){
 			throw("No api endpoint is defined");
@@ -83,6 +85,9 @@ component {
 		// ===================
 		// form our endpoint URL
 		local.targetURL = getSetting("apiEndPoint") & arguments.apiPath;
+		if(len(arguments.fileExtension) && !local.targetURL CONTAINS "?"){
+			local.targetURL &= "." & arguments.fileExtension;
+		}
 		local.requestQueryParam = {};
 		structAppend(local.requestQueryParam, getSetting("query"));
 		structAppend(local.requestQueryParam, arguments.query);
@@ -212,12 +217,20 @@ component {
 
 				local.apiArgs.httpMethod = local.httpMethod;
 
-				if(arrayLen(arguments.missingMethodArguments) != 1 || !isStruct(arguments.missingMethodArguments[1])){
-					throw(type:"genericAPI", message:"expecting a single settings argument");
-				}
+				// array of additional path arguments
+				local.apiPath = [];
 
-				// merge our api request arguments/settings
-				structAppend(local.apiArgs, arguments.missingMethodArguments[1]);
+				for(local.i in arguments.missingMethodArguments){
+					local.arg = arguments.missingMethodArguments[local.i];
+					if(isSimpleValue(local.arg)){
+						arrayAppend(local.apiPath, local.arg);
+					}else if(isStruct(local.arg)){
+						// merge our api request arguments/settings
+						structAppend(local.apiArgs, local.arg);
+						break;
+					}
+				}
+				
 
 				// remove the http method from our method name
 				local.apiMethod = replaceNoCase(arguments.missingMethodName, local.httpMethod, "");
@@ -235,11 +248,11 @@ component {
 					local.apiMethod = lcase(local.apiMethod);
 				}
 
-				// form our api apth
-				if(structKeyExists(local.apiArgs, "apiPath")){
-					local.apiArgs.apiPath = local.apiMethod & "/" & local.apiArgs.apiPath;
+				// form our api path
+				if(arrayLen(local.apiPath)){
+					local.apiArgs.apiPath = local.apiMethod & "/" & arrayToList(local.apiPath, "/");
 				}else{
-					local.apiArgs.apiPath = local.apiMethod & "/";
+					local.apiArgs.apiPath = local.apiMethod;
 				}
 
 				// do our api request

@@ -45,6 +45,7 @@ The only required setting is `apiEndPoint`. This is used to defined the base URL
 | lowerCase | false | If true, enpoints are converted to lowercase |
 | contentType | "" | A default value to use for the `Content-Type` header |
 | charset | "utf-8" | A default charset for requests |
+| fileExtension | "" | A file extension (without a ".") to add to the end of the api endpoint being called |
 | headers | {} | A struct defining default headers. This can be used set default headers for all requests, or requests using speific HTTP verbs. See below for an example. |
 | postData | {} | A struct containing key-value pairs describing data to be included in requests other then `GET` as form fields |
 | cookies | {} | A struct containing key-value pairs describing cookies to be included in all requests |
@@ -84,15 +85,15 @@ api.getSetting("headers").common["Authorization"] = "My token value";
 Requests to the API are made by prepending the HTTP verb that you wish to use to the endpoint of the API that you wish to call:
 
 ```
-result = api.GetEndpoint( [requestSettings] );
+result = api.GetEndpoint( [apiPath], [requestSettings] );
 ```
 
 ### Request settings
+* `apiPath` _string default=""_: you can add multiple arguments before the settings struct which will be used to form a path to the API endpoint.
 * `settings` _struct default=see below_: a struct of optional configuration options used to configure an individual API calls. Possible parameters are:
 
 ```
 {
-   "apiPath": "",
    "body": "",
    "postData": {},
    "query": {},
@@ -102,6 +103,7 @@ result = api.GetEndpoint( [requestSettings] );
    "bearer": settings.apiBearer,
    "contentType": settings.contentType,
    "charset": settings.charset,
+   "fileExtension": settings.fileExtension,
    "username": settings.apiUsername,
    "password": settings.apiPassword
 }
@@ -109,7 +111,6 @@ result = api.GetEndpoint( [requestSettings] );
 
 | Property | Default | Notes |
 | :-------- | :------ | :---- |
-| apiPath | "" | This gets added to the API base URL and the endpoint being called. For example a value of `/now` used on a call of `GetTime` will result in an endpoint of `time/now` |
 | body | "" | Either a string or a struct of data to use in the body of the request. A struct will be converted to a JSON string |
 | postData | {} | A struct containing key-value pairs describing data to be sent as form fields for this request. This will be merged with any default value |
 | query | {} | A struct containing key-value pairs describing data to form a query string for this request. This will be merged with any default value |
@@ -119,6 +120,7 @@ result = api.GetEndpoint( [requestSettings] );
 | bearer | settings.apiBearer | A token to use for beaerer authentication. This gets added as an `Authorization` header in the form `Bearer <apiBearer>`. If set, this will override the default value |
 | contentType | settings.contentType | A value to use for the `Content-Type` header for this http request. If set, this will override the default value |
 | charset | settings.charset | A value to use for the charset for this http request. If set, this will override the default value |
+| fileExtension | settings.fileExtension | A file extension (without a ".") to add to the end of the api endpoint for this http request. If set, this will override the default value |
 | username | settings.apiUsername | A username to use for basic authentication for this request. If set, this will override the default value |
 | password | settings.apiPassword | A password to use for basic authentication for this request. If set, this will override the default value |
 
@@ -138,11 +140,10 @@ api = new genericAPIWrapper({
 result = api.GetBasicAuth();
 
 // https://postman-echo.com/time/now
-result = api.GetTime( { apiPath: "/now" } );
+result = api.GetTime( "now" );
 
 // https://postman-echo.com/time/add?timestamp=2016-10-10&years=100
-result = api.GetTime( { 
-   apiPath: "/add",
+result = api.GetTime( "add", { 
    query: {
       "timestamp": "2016-10-10",
       "years": 100
