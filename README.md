@@ -67,7 +67,7 @@ headers: {
 ```
 
 ### Default settings at runtime
-You can modify default settings using a hepller function `setSetting()`. For example:
+You can modify default settings using a helper function `setSetting()`. For example:
 
 ```
 api.setSetting("cookies", {
