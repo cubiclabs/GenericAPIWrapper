@@ -59,7 +59,7 @@ headers: {
    common: {
       "Authorization": "Token in here"
    },
-   // 'post' headers will just be include in POST requests. A similar structure can be used for all other HTTP verbs
+   // 'post' headers will just be included in POST requests. A similar structure can be used for all other HTTP verbs
    post: {
       "Content-Type": "application/x-www-form-urlencoded"
    }
