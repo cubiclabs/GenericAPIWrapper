@@ -20,6 +20,7 @@ component {
 		"contentType": "",
 		"charset": "utf-8",
 		"fileExtension": "",
+		"trailingSlash": false,
 		"headers": {}, // default headers defined similar to axios
 		"postData": {}, // default postData to send in requests other than GET
 		"cookies": {}, // cookies to send with every request
@@ -74,7 +75,8 @@ component {
 		string username=getSetting("apiUserName"),
 		string password=getSetting("apiPassword"),
 		string charset=getSetting("charset"),
-		string fileExtension=getSetting("fileExtension")){
+		string fileExtension=getSetting("fileExtension"),
+		boolean trailingSlash=getSetting("trailingSlash")){
 
 		if(!len(getSetting("apiEndPoint"))){
 			throw("No api endpoint is defined");
@@ -87,6 +89,11 @@ component {
 		local.targetURL = getSetting("apiEndPoint") & arguments.apiPath;
 		if(len(arguments.fileExtension) && !local.targetURL CONTAINS "?"){
 			local.targetURL &= "." & arguments.fileExtension;
+		}
+		if(!len(arguments.fileExtension) && !local.targetURL CONTAINS "?" && arguments.trailingSlash){
+			if(right(local.targetURL, 1) != "/"){
+				local.targetURL &= "/"; // trailing slash
+			}
 		}
 		local.requestQueryParam = {};
 		structAppend(local.requestQueryParam, getSetting("query"));

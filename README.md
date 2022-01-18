@@ -24,6 +24,8 @@ api = new genericAPIWrapper( [settings] );
    "lowerCase": false,
    "contentType": "",
    "charset": "utf-8",
+   "fileExtension": "",
+   "trailingSlash": false,
    "headers": {},
    "postData": {},
    "cookies": {},
@@ -39,13 +41,14 @@ The only required setting is `apiEndPoint`. This is used to defined the base URL
 | apiEndPoint (required) | "" | This is the baseURL for the API. For example `https://postman-echo.com/` |
 | apiUserName | "" | A username to use for basic authentication |
 | apiPassword | "" | A password to use for basic authentication |
-| apiBearer | "" | A token to use for beaerer authentication. This gets added as an `Authorization` header in the form `Bearer <apiBearer>` |
+| apiBearer | "" | A token to use for bearer authentication. This gets added as an `Authorization` header in the form `Bearer <apiBearer>` |
 | timeout | 10 | A timeout value in seconds for the http requests |
 | camelDashes | false | If ture, CamelCase requests get converted to dash seperated strings. For example `GetCamelCase()` will call a `Camel-Case` endpoint using the `GET` http verb |
 | lowerCase | false | If true, enpoints are converted to lowercase |
 | contentType | "" | A default value to use for the `Content-Type` header |
 | charset | "utf-8" | A default charset for requests |
 | fileExtension | "" | A file extension (without a ".") to add to the end of the api endpoint being called |
+| trailingSlash | false | If true, ensures that there is a trailing slash to API endpoints when there is no query string present already |
 | headers | {} | A struct defining default headers. This can be used set default headers for all requests, or requests using speific HTTP verbs. See below for an example. |
 | postData | {} | A struct containing key-value pairs describing data to be included in requests other then `GET` as form fields |
 | cookies | {} | A struct containing key-value pairs describing cookies to be included in all requests |
